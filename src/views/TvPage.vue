@@ -7,21 +7,10 @@
             :src="`https://image.tmdb.org/t/p/original` + tv.poster_path"
             :alt="tv.title"
             class="card grandezza"
-            @mouseover="dettagli = true"
-            @mouseleave="dettagli = false"
+            @click="vediDettagli(tv.id)"
           />
           <div>
-            <div v-show="dettagli" class="card-img-overlay">
-              <h4 class="titolo">{{ tv.name }}</h4>
-              <p class="overview">Voto medio: {{ tv.vote_average }}</p>
-              <button
-                type="button"
-                class="btn btn-secondary bottone"
-                @click="vediDettagli"
-              >
-                Dettagli
-              </button>
-            </div>
+            <div v-show="dettagli" class="card-img-overlay"></div>
           </div>
         </div>
       </div>
@@ -64,7 +53,24 @@ export default {
       }
     },
 
-    vediDettagli() {},
+    vediDettagli(id) {
+      this.$router.push({ name: "paginaTv", params: { tv: id } });
+    },
+
+    async getRisultato(search) {
+      this.tvs = await this.fetcher("search/multi", { query: search });
+    },
+  },
+
+  watch: {
+    "$route.query.search": {
+      handler: function (search) {
+        console.log(search);
+        this.getRisultato(search);
+      },
+      deep: true,
+      immediate: true,
+    },
   },
 };
 </script>
@@ -72,6 +78,7 @@ export default {
 <style>
 .titolo {
   color: whitesmoke;
+  font-family: fantasy;
 }
 
 .card {

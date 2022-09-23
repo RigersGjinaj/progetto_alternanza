@@ -1,5 +1,4 @@
 <template>
-  <div></div>
   <div class="container text-center">
     <div class="row">
       <div class="col" v-for="movie in movies.results" :key="movie.id">
@@ -8,20 +7,9 @@
             :src="`https://image.tmdb.org/t/p/original` + movie.poster_path"
             :alt="movie.title"
             class="card grandezza"
-            @mouseover="dettagli = true"
-            @mouseleave="dettagli = false"
+            @click="vediDettagli(movie.id)"
           />
-          <div v-show="dettagli" class="card-img-overlay">
-            <h4 class="titolo">{{ movie.title }}</h4>
-            <p class="overview">Voto medio: {{ movie.vote_average }}</p>
-            <button
-              type="button"
-              class="btn btn-secondary bottone"
-              @click="vediDettagli(movie.id)"
-            >
-              Dettagli
-            </button>
-          </div>
+          <div v-show="dettagli" class="card-img-overlay"></div>
         </div>
       </div>
     </div>
@@ -44,7 +32,6 @@ export default {
   methods: {
     async getMovies() {
       this.movies = await this.fetcher("movie/popular");
-
       console.log(this.movies);
     },
 
@@ -66,13 +53,27 @@ export default {
     vediDettagli(id) {
       this.$router.push({ name: "pagina", params: { movie: id } });
     },
+    async getRisultato(search) {
+      this.movies = await this.fetcher("search/multi", { query: search });
+    },
+  },
+
+  watch: {
+    "$route.query.search": {
+      handler: function (search) {
+        console.log(search);
+        this.getRisultato(search);
+      },
+      deep: true,
+      immediate: true,
+    },
   },
 };
 </script>
 
 <style>
 .tiolo {
-  color: black;
+  color: white;
   font-family: fantasy;
 }
 .card {

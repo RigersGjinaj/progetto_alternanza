@@ -1,12 +1,16 @@
 <template>
   <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
-      <img
-        src="./assets/jason-dent-SnXIF8_2oPw-unsplash.jpg"
-        alt=""
-        class="logo"
-      />
-      <h1 class="titoloLogo">Movie World</h1>
+      <router-link to="/">
+        <img
+          src="./assets/jason-dent-SnXIF8_2oPw-unsplash.jpg"
+          alt=""
+          class="logo"
+        />
+      </router-link>
+      <router-link to="/">
+        <h1 class="titoloLogo">Movie World</h1>
+      </router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -26,6 +30,18 @@
           <li class="nav-item">
             <router-link to="/serietv" class="film-serie">Serie Tv</router-link>
           </li>
+          <li>
+            <form class="d-flex" role="search" @submit.prevent="ricerca">
+              <input
+                class="form-control me-2"
+                type="search"
+                placeholder="Cerca"
+                aria-label="Cerca"
+                v-model="search"
+              />
+              <button class="btn btn-outline-light" type="submit">Cerca</button>
+            </form>
+          </li>
         </ul>
       </div>
     </div>
@@ -33,6 +49,25 @@
 
   <router-view />
 </template>
+
+<script>
+export default {
+  mounted() {},
+  data() {
+    return {
+      search: null,
+    };
+  },
+  methods: {
+    ricerca() {
+      this.$router.replace({
+        path: this.$route.path,
+        query: { search: this.search },
+      });
+    },
+  },
+};
+</script>
 
 <style>
 #app {
