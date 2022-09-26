@@ -16,6 +16,14 @@
       </div>
     </div>
   </div>
+  <div class="btn-group altro" role="group" aria-label="Basic example">
+    <button type="button" class="btn btn-primary" @click="mostraAltro">
+      Mostra altre Serie Tv
+    </button>
+    <button type="button" class="btn btn-primary" @click="mostraMeno">
+      Mostra meno Serie Tv
+    </button>
+  </div>
 </template>
 
 <script>
@@ -42,6 +50,7 @@ export default {
       const apiKey = "6f9286d54de4891ea7a5c91779e09786";
       options.api_key = apiKey;
       options.language = "it-IT";
+      options.page = this.tvs.page;
       const queryParams = "?" + new URLSearchParams(options).toString();
       try {
         const res = await fetch(
@@ -60,13 +69,26 @@ export default {
     async getRisultato(search) {
       this.tvs = await this.fetcher("search/multi", { query: search });
     },
+
+    mostraAltro() {
+      this.tvs.page++;
+      this.tvs.push(this.getTv());
+    },
+    mostraMeno() {
+      if (this.tvs.page == 1) {
+        return;
+      }
+      this.tvs.page--;
+      this.tvs.push(this.getTv());
+    },
   },
 
   watch: {
     "$route.query.search": {
       handler: function (search) {
         console.log(search);
-        this.getRisultato(search);
+        if (search) this.getRisultato(search);
+        else this.getTv();
       },
       deep: true,
       immediate: true,
@@ -114,5 +136,8 @@ export default {
   left: 10px;
   padding: 10px;
   font-family: monospace;
+}
+.altro {
+  margin-bottom: 10px;
 }
 </style>

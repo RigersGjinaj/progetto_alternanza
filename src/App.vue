@@ -9,7 +9,7 @@
         />
       </router-link>
       <router-link to="/">
-        <h1 class="titoloLogo">Movie World</h1>
+        <h1 class="titoloLogo mouse">Movie World</h1>
       </router-link>
       <button
         class="navbar-toggler"
@@ -30,6 +30,13 @@
           <li class="nav-item">
             <router-link to="/serietv" class="film-serie">Serie Tv</router-link>
           </li>
+          <select
+            class="btn btn-primary selezione"
+            aria-label="Default select example"
+          >
+            <option value="1">Italiano</option>
+            <option value="2">Inglese</option>
+          </select>
           <li>
             <form class="d-flex" role="search" @submit.prevent="ricerca">
               <input
@@ -64,6 +71,7 @@ export default {
         path: this.$route.path,
         query: { search: this.search },
       });
+      this.search = null;
     },
   },
 };
@@ -94,5 +102,15 @@ export default {
 .titoloLogo {
   font-family: fantasy;
   color: white;
+}
+
+.selezione {
+  width: 300px;
+  margin-bottom: 5px;
+  margin-left: 39%;
+  position: relative;
+}
+.mouse:hover {
+  color: blue;
 }
 </style>
