@@ -1,128 +1,24 @@
 <template>
-  <h1 class="titolo">{{ movie.title }}</h1>
+  <titolo-comp :titolo="movie.title"></titolo-comp>
   <div class="parent flex-parent">
     <div class="child flex-child">
-      <img
-        :src="`https://image.tmdb.org/t/p/original` + movie.poster_path"
-        :alt="movie.title"
-        class="img"
-      />
+      <locandina-comp :immagine="movie.poster_path"></locandina-comp>
     </div>
     <div class="child flex-child riquadro">
-      <h5 v-if="this.$root.selectedLanguage == 'it'" class="titolo">Trama:</h5>
-      <h5 v-else class="titolo">Overview:</h5>
-      <p v-if="movie.overview == ''" class="overview">Trama non presente</p>
-      <p v-else class="overview">{{ movie.overview }}</p>
-      <h5 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
-        Data di rilascio:
-      </h5>
-      <h5 v-else class="titolo">Release date:</h5>
-      <p class="overview">{{ movie.release_date }}</p>
-      <h5 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
-        Voto medio:
-      </h5>
-      <h5 v-else class="titolo">Average rating:</h5>
-      <p v-if="this.$root.selectedLanguage == 'it'" class="overview">
-        {{ movie.vote_average }} <br />
-        voti totali: {{ movie.vote_count }}
-      </p>
-      <p v-else class="overview">
-        {{ movie.vote_average }} <br />
-        vote count: {{ movie.vote_count }}
-      </p>
-      <h6 v-if="flatrate != undefined" class="titolo">Streaming:</h6>
-      <div class="container text-center">
-        <div class="row">
-          <div
-            class="col provider"
-            v-for="flatrate in flatrate"
-            :key="flatrate.id"
-          >
-            <a :href="link" target="blank">
-              <img
-                :src="getUrl(flatrate.logo_path)"
-                :alt="flatrate.provider_name"
-                class="sito"
-              />
-            </a>
-          </div>
-        </div>
-      </div>
-      <h6
-        v-if="buy != undefined && this.$root.selectedLanguage == 'it'"
-        class="titolo"
-      >
-        Compra:
-      </h6>
-      <h6
-        v-else-if="buy != undefined && this.$root.selectedLanguage == 'en'"
-        class="titolo"
-      >
-        Buy:
-      </h6>
-      <div class="container text-center">
-        <div class="row">
-          <div class="col provider" v-for="buy in buy" :key="buy.id">
-            <a :href="link" target="blank"
-              ><img
-                :src="getUrl(buy.logo_path)"
-                :alt="buy.provider_name"
-                class="sito"
-              />
-            </a>
-          </div>
-        </div>
-      </div>
+      <descrizione-comp
+        :trama="movie.overview"
+        :dataDiRilascio="movie.release_date"
+        :votoMedio="movie.vote_average"
+        :contoVoti="movie.vote_count"
+      ></descrizione-comp>
+      <provider-comp
+        :flatrate="flatrate"
+        :buy="buy"
+        :link="link"
+      ></provider-comp>
     </div>
   </div>
-
-  <h3 v-if="this.$root.selectedLanguage == 'it'" class="titolo">Recensioni</h3>
-  <h3 v-else class="titolo">Reviews:</h3>
-  <h4
-    v-if="reviews.results.length == 0 && this.$root.selectedLanguage == 'it'"
-    class="titolo"
-  >
-    Non ci sono recensioni
-  </h4>
-  <h4
-    v-else-if="
-      reviews.results.length == 0 && this.$root.selectedLanguage == 'en'
-    "
-    class="titolo"
-  >
-    There are no reviews
-  </h4>
-  <div
-    v-for="review in reviews.results"
-    :key="review.id"
-    v-else
-    class="recensioni"
-  >
-    <h5 v-if="this.$root.selectedLanguage == 'it'" class="autore">
-      Autore: {{ review.author }}
-    </h5>
-    <h5 v-else class="autore">Author: {{ review.author }}</h5>
-    <p class="recensione">{{ review.content }}</p>
-    <p
-      v-if="
-        review.author_details.rating != null &&
-        this.$root.selectedLanguage == 'it'
-      "
-      class="recensione"
-    >
-      Voto: {{ review.author_details.rating }}
-    </p>
-    <p
-      v-if="
-        review.author_details.rating != null &&
-        this.$root.selectedLanguage == 'en'
-      "
-      class="recensione"
-    >
-      Rate: {{ review.author_details.rating }}
-    </p>
-  </div>
-
+  <recensioni-comp :reviews="reviews"></recensioni-comp>
   <h3 v-if="this.$root.selectedLanguage == 'it'" class="titolo">Film simili</h3>
   <h3 v-else class="titolo">Similar movies</h3>
   <h3
@@ -164,12 +60,25 @@
   </div>
 </template>
 <script>
+import DescrizioneComp from "@/components/DescrizioneComp.vue";
+import TitoloComp from "@/components/TitoloComp.vue";
+import LocandinaComp from "@/components/LocandinaComp.vue";
+import ProviderComp from "@/components/ProviderComp.vue";
+import RecensioniComp from "@/components/RecensioniComp.vue";
 export default {
   mounted() {
     this.getMovie();
     this.getRecommendations();
     this.getReviews();
     this.getProviders();
+  },
+
+  components: {
+    DescrizioneComp,
+    TitoloComp,
+    LocandinaComp,
+    ProviderComp,
+    RecensioniComp,
   },
   created() {
     this.$watch(
@@ -230,7 +139,7 @@ export default {
     },
 
     vediDettagli(id) {
-      this.$router.push({ name: "pagina", params: { movie: id } });
+      this.$router.push({ name: "paginaFilm", params: { movie: id } });
     },
 
     async getReviews() {

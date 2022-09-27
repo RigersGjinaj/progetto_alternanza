@@ -20,9 +20,9 @@ const routes = [
     component: () => import("@/views/TvPage.vue"),
   },
   {
-    path: "/paginaDettagli/:movie",
-    name: "pagina",
-    component: () => import("@/components/PaginaDettagli.vue"),
+    path: "/paginaDettagliFilm/:movie",
+    name: "paginaFilm",
+    component: () => import("@/components/PaginaDettagliFilm.vue"),
   },
   {
     path: "/paginaDettagliTv/:tv",

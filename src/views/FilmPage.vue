@@ -95,7 +95,7 @@ export default {
     },
 
     vediDettagli(id) {
-      this.$router.push({ name: "pagina", params: { movie: id } });
+      this.$router.push({ name: "paginaFilm", params: { movie: id } });
     },
     async getRisultato(search) {
       this.movies = await this.fetcher("search/multi", { query: search });
