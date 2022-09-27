@@ -1,5 +1,8 @@
 <template>
-  <h1 class="titolo">Film e Serie Tv</h1>
+  <h1 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
+    Film e Serie Tv
+  </h1>
+  <h1 v-else class="titolo">Movies and TV series</h1>
   <film-page></film-page>
   <tv-page></tv-page>
 </template>

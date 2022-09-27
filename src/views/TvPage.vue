@@ -13,23 +13,58 @@
             <div v-show="dettagli" class="card-img-overlay"></div>
           </div>
         </div>
+        <hr class="linea" />
       </div>
     </div>
   </div>
   <div class="btn-group altro" role="group" aria-label="Basic example">
-    <button type="button" class="btn btn-primary" @click="mostraAltro">
-      Mostra altre Serie Tv
+    <button
+      v-if="this.$root.selectedLanguage == 'it'"
+      type="button"
+      class="btn btn-primary"
+      @click="mostraAltro"
+    >
+      Mostra di piu'
     </button>
-    <button type="button" class="btn btn-primary" @click="mostraMeno">
-      Mostra meno Serie Tv
+    <button
+      v-if="this.$root.selectedLanguage == 'it'"
+      type="button"
+      class="btn btn-primary"
+      @click="mostraMeno"
+    >
+      Mostra meno
+    </button>
+    <button
+      v-if="this.$root.selectedLanguage == 'en'"
+      type="button"
+      class="btn btn-primary"
+      @click="mostraAltro"
+    >
+      Show more
+    </button>
+    <button
+      v-if="this.$root.selectedLanguage == 'en'"
+      type="button"
+      class="btn btn-primary"
+      @click="mostraMeno"
+    >
+      Show less
     </button>
   </div>
 </template>
 
 <script>
+var rootElement = document.documentElement;
 export default {
   mounted() {
     this.getTv();
+    this.$watch(
+      () => this.$root.selectedLanguage,
+      () => {
+        this.getTv();
+      },
+      { immediate: true }
+    );
   },
 
   data() {
@@ -42,14 +77,12 @@ export default {
   methods: {
     async getTv() {
       this.tvs = await this.fetcher("tv/popular");
-
-      console.log(this.tvs);
     },
 
     async fetcher(url, options = {}) {
       const apiKey = "6f9286d54de4891ea7a5c91779e09786";
       options.api_key = apiKey;
-      options.language = "it-IT";
+      options.language = this.$root.selectedLanguage || "it";
       options.page = this.tvs.page;
       const queryParams = "?" + new URLSearchParams(options).toString();
       try {
@@ -73,6 +106,10 @@ export default {
     mostraAltro() {
       this.tvs.page++;
       this.tvs.push(this.getTv());
+      rootElement.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     },
     mostraMeno() {
       if (this.tvs.page == 1) {
@@ -80,6 +117,10 @@ export default {
       }
       this.tvs.page--;
       this.tvs.push(this.getTv());
+      rootElement.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     },
   },
 
@@ -112,7 +153,10 @@ export default {
   border: solid 4px whitesmoke;
   opacity: 50%;
 }
-
+.linea {
+  color: black;
+  height: 4px;
+}
 .tiolo {
   color: white;
   font-family: Georgia, "Times New Roman", Times, serif;

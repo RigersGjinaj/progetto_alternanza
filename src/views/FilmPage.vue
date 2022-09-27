@@ -11,23 +11,58 @@
           />
           <div v-show="dettagli" class="card-img-overlay"></div>
         </div>
+        <hr class="linea" />
       </div>
     </div>
   </div>
   <div class="btn-group altro" role="group" aria-label="Basic example">
-    <button type="button" class="btn btn-primary" @click="mostraAltro">
-      Mostra altri film
+    <button
+      v-if="this.$root.selectedLanguage == 'it'"
+      type="button"
+      class="btn btn-primary"
+      @click="mostraAltro"
+    >
+      Mostra di piu'
     </button>
-    <button type="button" class="btn btn-primary" @click="mostraMeno">
-      Mostra meno film
+    <button
+      v-if="this.$root.selectedLanguage == 'it'"
+      type="button"
+      class="btn btn-primary"
+      @click="mostraMeno"
+    >
+      Mostra meno
+    </button>
+    <button
+      v-if="this.$root.selectedLanguage == 'en'"
+      type="button"
+      class="btn btn-primary"
+      @click="mostraAltro"
+    >
+      Show more
+    </button>
+    <button
+      v-if="this.$root.selectedLanguage == 'en'"
+      type="button"
+      class="btn btn-primary"
+      @click="mostraMeno"
+    >
+      Show less
     </button>
   </div>
 </template>
 
 <script>
+var rootElement = document.documentElement;
 export default {
   mounted() {
     this.getMovies();
+    this.$watch(
+      () => this.$root.selectedLanguage,
+      () => {
+        this.getMovies();
+      },
+      { immediate: true }
+    );
   },
 
   data() {
@@ -46,7 +81,7 @@ export default {
     async fetcher(url, options = {}) {
       const apiKey = "6f9286d54de4891ea7a5c91779e09786";
       options.api_key = apiKey;
-      options.language = "it-IT";
+      options.language = this.$root.selectedLanguage || "it";
       options.page = this.movies.page;
       const queryParams = "?" + new URLSearchParams(options).toString();
       try {
@@ -68,14 +103,22 @@ export default {
 
     mostraAltro() {
       this.movies.page++;
-      this.movies.push(this.getMovies());
+      this.getMovies();
+      rootElement.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     },
     mostraMeno() {
       if (this.movies.page == 1) {
         return;
       }
       this.movies.page--;
-      this.movies.push(this.getMovies());
+      this.getMovies();
+      rootElement.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     },
   },
 
@@ -100,6 +143,10 @@ export default {
 .card {
   width: 200px;
   height: 300px;
+}
+.linea {
+  color: black;
+  height: 4px;
 }
 .distanza {
   margin-top: 20px;

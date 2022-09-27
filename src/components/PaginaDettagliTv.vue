@@ -9,14 +9,25 @@
       />
     </div>
     <div class="child flex-child riquadro">
-      <h5 class="titolo">Trama:</h5>
+      <h5 v-if="this.$root.selectedLanguage == 'it'" class="titolo">Trama:</h5>
+      <h5 v-else class="titolo">Overview</h5>
       <p class="overview">{{ tv.overview }}</p>
-      <h5 class="titolo">Data di rilascio:</h5>
+      <h5 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
+        Data di rilascio:
+      </h5>
+      <h5 v-else class="titolo">Release date:</h5>
       <p class="overview">{{ tv.first_air_date }}</p>
-      <h5 class="titolo">Voto medio:</h5>
-      <p class="overview">
+      <h5 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
+        Voto medio:
+      </h5>
+      <h5 v-else class="titolo">Average rating:</h5>
+      <p v-if="this.$root.selectedLanguage == 'it'" class="overview">
         {{ tv.vote_average }} <br />
         voti totali: {{ tv.vote_count }}
+      </p>
+      <p v-else class="overview">
+        {{ tv.vote_average }} <br />
+        vote count: {{ tv.vote_count }}
       </p>
       <h6 v-if="flatrate != undefined" class="titolo">Streaming:</h6>
       <div class="container text-center">
@@ -36,7 +47,18 @@
           </div>
         </div>
       </div>
-      <h6 v-if="buy != undefined" class="titolo">Compra:</h6>
+      <h6
+        v-if="buy != undefined && this.$root.selectedLanguage == 'it'"
+        class="titolo"
+      >
+        Compra:
+      </h6>
+      <h6
+        v-else-if="buy != undefined && this.$root.selectedLanguage == 'en'"
+        class="titolo"
+      >
+        Buy:
+      </h6>
       <div class="container text-center">
         <div class="row">
           <div class="col provider" v-for="buy in buy" :key="buy.id">
@@ -52,9 +74,21 @@
       </div>
     </div>
   </div>
-  <h3 class="titolo">Recensioni</h3>
-  <h4 v-if="reviews.results.length == 0" class="titolo">
+  <h3 v-if="this.$root.selectedLanguage == 'it'" class="titolo">Recensioni</h3>
+  <h3 v-else class="titolo">Reviews:</h3>
+  <h4
+    v-if="reviews.results.length == 0 && this.$root.selectedLanguage == 'it'"
+    class="titolo"
+  >
     Non ci sono recensioni
+  </h4>
+  <h4
+    v-else-if="
+      reviews.results.length == 0 && this.$root.selectedLanguage == 'en'
+    "
+    class="titolo"
+  >
+    There are no reviews
   </h4>
   <div
     v-for="review in reviews.results"
@@ -62,13 +96,50 @@
     v-else
     class="recensioni"
   >
-    <h5 class="autore">Autore: {{ review.author }}</h5>
+    <h5 v-if="this.$root.selectedLanguage == 'it'" class="autore">
+      Autore: {{ review.author }}
+    </h5>
+    <h5 v-else class="autore">Author: {{ review.author }}</h5>
     <p class="recensione">{{ review.content }}</p>
-    <p v-if="review.author_details.rating != null" class="recensione">
+    <p
+      v-if="
+        review.author_details.rating != null &&
+        this.$root.selectedLanguage == 'it'
+      "
+      class="recensione"
+    >
       Voto: {{ review.author_details.rating }}
     </p>
+    <p
+      v-if="
+        review.author_details.rating != null &&
+        this.$root.selectedLanguage == 'en'
+      "
+      class="recensione"
+    >
+      Rate: {{ review.author_details.rating }}
+    </p>
   </div>
-  <h3 class="titolo">Serie tv simili</h3>
+  <h3 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
+    Serie TV simili
+  </h3>
+  <h3 v-else class="titolo">Similar TV series</h3>
+  <h3
+    v-if="
+      recommendations.results.length == 0 && this.$root.selectedLanguage == 'it'
+    "
+    class="titolo"
+  >
+    Non ci sono serie tv simili
+  </h3>
+  <h3
+    v-else-if="
+      recommendations.results.length == 0 && this.$root.selectedLanguage == 'en'
+    "
+    class="titolo"
+  >
+    There are no similar TV series
+  </h3>
   <div class="container text-center">
     <div class="row">
       <div
@@ -99,7 +170,6 @@ export default {
     this.getRecommendations();
     this.getReviews();
     this.getProviders();
-    console.log(this.buy);
   },
   data() {
     return {
@@ -122,6 +192,17 @@ export default {
       },
       { immediate: true }
     );
+
+    this.$watch(
+      () => this.$root.selectedLanguage,
+      () => {
+        this.getTv();
+        this.getRecommendations();
+        this.getReviews();
+        this.getProviders();
+      },
+      { immediate: true }
+    );
   },
   methods: {
     async getTv() {
@@ -130,7 +211,7 @@ export default {
     async fetcher(url, options = {}) {
       const apiKey = "6f9286d54de4891ea7a5c91779e09786";
       options.api_key = apiKey;
-      options.language = "it-IT";
+      options.language = this.$root.selectedLanguage || "it";
       const queryParams = "?" + new URLSearchParams(options).toString();
       try {
         const res = await fetch(
