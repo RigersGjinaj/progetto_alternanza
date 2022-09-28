@@ -1,62 +1,32 @@
 <template>
-  <titolo-comp :titolo="movie.title"></titolo-comp>
-  <div class="parent flex-parent">
-    <div class="child flex-child">
-      <locandina-comp :immagine="movie.poster_path"></locandina-comp>
-    </div>
-    <div class="child flex-child riquadro">
-      <descrizione-comp
-        :trama="movie.overview"
-        :dataDiRilascio="movie.release_date"
-        :votoMedio="movie.vote_average"
-        :contoVoti="movie.vote_count"
-      ></descrizione-comp>
-      <provider-comp
-        :flatrate="flatrate"
-        :buy="buy"
-        :link="link"
-      ></provider-comp>
-    </div>
-  </div>
-  <recensioni-comp :reviews="reviews"></recensioni-comp>
-  <h3 v-if="this.$root.selectedLanguage == 'it'" class="titolo">Film simili</h3>
-  <h3 v-else class="titolo">Similar movies</h3>
-  <h3
-    v-if="
-      recommendations.results.length == 0 && this.$root.selectedLanguage == 'it'
-    "
-    class="titolo"
-  >
-    Film simili non presenti
-  </h3>
-  <h3
-    v-else-if="
-      recommendations.results.length == 0 && this.$root.selectedLanguage == 'en'
-    "
-    class="titolo"
-  >
-    Similar films not present
-  </h3>
-  <div v-else class="container text-center">
-    <div class="row">
-      <div
-        class="col"
-        v-for="recommendation in recommendations.results"
-        :key="recommendation.id"
-      >
-        <div class="distanza card text-bg-dark">
-          <img
-            :src="
-              `https://image.tmdb.org/t/p/original` + recommendation.poster_path
-            "
-            :alt="recommendation.title"
-            class="card grandezza"
-            @click="vediDettagli(recommendation.id)"
-          />
-          <div v-show="dettagli" class="card-img-overlay"></div>
-        </div>
+  <div>
+    <titolo-comp :titolo="movie.title"></titolo-comp>
+    <div class="parent flex-parent">
+      <div class="child flex-child">
+        <locandina-comp :immagine="movie.poster_path"></locandina-comp>
+      </div>
+      <div class="child flex-child riquadro">
+        <descrizione-comp
+          :trama="movie.overview"
+          :dataDiRilascio="movie.release_date"
+          :votoMedio="movie.vote_average"
+          :contoVoti="movie.vote_count"
+          :entra="approvazione"
+          :session="session"
+          :vota="vota"
+        ></descrizione-comp>
+        <provider-comp
+          :flatrate="flatrate"
+          :buy="buy"
+          :link="link"
+        ></provider-comp>
       </div>
     </div>
+    <recensioni-comp :reviews="reviews"></recensioni-comp>
+    <simili-comp
+      :redirect="vediDettagli"
+      :recommendations="recommendations"
+    ></simili-comp>
   </div>
 </template>
 <script>
@@ -65,12 +35,15 @@ import TitoloComp from "@/components/TitoloComp.vue";
 import LocandinaComp from "@/components/LocandinaComp.vue";
 import ProviderComp from "@/components/ProviderComp.vue";
 import RecensioniComp from "@/components/RecensioniComp.vue";
+import SimiliComp from "@/components/SimiliComp.vue";
 export default {
   mounted() {
     this.getMovie();
     this.getRecommendations();
     this.getReviews();
     this.getProviders();
+    this.getAuthentication();
+    /*this.getToken();*/
   },
 
   components: {
@@ -79,6 +52,7 @@ export default {
     LocandinaComp,
     ProviderComp,
     RecensioniComp,
+    SimiliComp,
   },
   created() {
     this.$watch(
@@ -111,6 +85,10 @@ export default {
       buy: {},
       link: "",
       traslations: [],
+      token: {},
+      session: undefined,
+      voto: {},
+      guest: {},
     };
   },
   methods: {
@@ -131,6 +109,21 @@ export default {
         return console.error(message);
       }
     },
+    /* async sessions(url, options = {}) {
+      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      options.api_key = apiKey;
+      options.language = this.$root.selectedLanguage || "it";
+      options.request_token = this.token.request_token;
+      const queryParams = "?" + new URLSearchParams(options).toString();
+      try {
+        const res = await fetch(
+          "https://api.themoviedb.org/3/" + url + queryParams
+        );
+        return await res.json();
+      } catch (message) {
+        return console.error(message);
+      }
+    },*/
 
     async getRecommendations() {
       this.recommendations = await this.fetcher(
@@ -151,7 +144,6 @@ export default {
       await this.fetcher(
         "movie/" + this.$route.params.movie + "/watch/providers"
       ).then((res) => {
-        console.log(res);
         this.flatrate = res.results?.IT
           ? res.results?.IT.flatrate
           : res.results?.US.flatrate;
@@ -165,6 +157,41 @@ export default {
       return path != undefined
         ? `https://image.tmdb.org/t/p/original${path}`
         : `https://www.google.com/search?q=img+100x100&rlz=1C1ONGR_itIT1023IT1023&sxsrf=ALiCzsYsmGF83Wom32UvtR0BCO5Eye9idw:1664196645966&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjc7azPv7L6AhWKRvEDHYqLAlAQ_AUoAXoECAEQAw&biw=1366&bih=625&dpr=1#imgrc=L9VFGqEeTKmGeM`;
+    },
+    /*async getToken() {
+      this.token = await this.fetcher("authentication/token/new");
+    },
+    async getSession() {
+      this.session = await this.sessions("authentication/session/new");
+    },
+    approvazione() {
+      this.getToken();
+      window.location.href =
+        "https://www.themoviedb.org/authenticate/" + this.token.request_token;
+      this.getSession();
+      console.log(this.session);
+    },*/
+    async autentifica(url, options = {}) {
+      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      options.api_key = apiKey;
+      options.language = this.$root.selectedLanguage || "it";
+      options.guest_session_id = this.guest.guest_session_id;
+      const queryParams = "?" + new URLSearchParams(options).toString();
+      try {
+        const res = await fetch(
+          "https://api.themoviedb.org/3/" + url + queryParams
+        );
+        return await res.json();
+      } catch (message) {
+        return console.error(message);
+      }
+    },
+    async getAuthentication() {
+      this.guest = await this.fetcher("authentication/guest_session/new");
+    },
+    vota() {
+      this.getAuthentication();
+      this.autentifica();
     },
   },
 };

@@ -1,61 +1,20 @@
 <template>
-  <div class="container text-center">
-    <div class="row">
-      <div class="col" v-for="tv in tvs.results" :key="tv.id">
-        <div class="distanza card text-bg-dark">
-          <img
-            :src="`https://image.tmdb.org/t/p/original` + tv.poster_path"
-            :alt="tv.title"
-            class="card grandezza"
-            @click="vediDettagli(tv.id)"
-          />
-          <div>
-            <div v-show="dettagli" class="card-img-overlay"></div>
-          </div>
-        </div>
-        <hr class="linea" />
-      </div>
-    </div>
-  </div>
-  <div class="btn-group altro" role="group" aria-label="Basic example">
-    <button
-      v-if="this.$root.selectedLanguage == 'it'"
-      type="button"
-      class="btn btn-primary"
-      @click="mostraAltro"
-    >
-      Mostra di piu'
-    </button>
-    <button
-      v-if="this.$root.selectedLanguage == 'it'"
-      type="button"
-      class="btn btn-primary"
-      @click="mostraMeno"
-    >
-      Mostra meno
-    </button>
-    <button
-      v-if="this.$root.selectedLanguage == 'en'"
-      type="button"
-      class="btn btn-primary"
-      @click="mostraAltro"
-    >
-      Show more
-    </button>
-    <button
-      v-if="this.$root.selectedLanguage == 'en'"
-      type="button"
-      class="btn btn-primary"
-      @click="mostraMeno"
-    >
-      Show less
-    </button>
+  <div>
+    <home-comp :vediDettagli="vediDettagli" :displays="tvs"></home-comp>
+    <pagination-component
+      :next="mostraAltro"
+      :previous="mostraMeno"
+      :currentPage="tvs.page"
+      :totalPages="tvs.total_pages"
+    ></pagination-component>
   </div>
 </template>
 
 <script>
-var rootElement = document.documentElement;
+import PaginationComponent from "@/components/PaginationComponent.vue";
+import HomeComp from "@/components/HomeComp.vue";
 export default {
+  components: { PaginationComponent, HomeComp },
   mounted() {
     this.getTv();
     this.$watch(
@@ -105,8 +64,8 @@ export default {
 
     mostraAltro() {
       this.tvs.page++;
-      this.tvs.push(this.getTv());
-      rootElement.scrollTo({
+      this.getTv();
+      document.documentElement.scrollTo({
         top: 0,
         behavior: "smooth",
       });
@@ -116,8 +75,8 @@ export default {
         return;
       }
       this.tvs.page--;
-      this.tvs.push(this.getTv());
-      rootElement.scrollTo({
+      this.getTv();
+      document.documentElement.scrollTo({
         top: 0,
         behavior: "smooth",
       });
@@ -139,11 +98,6 @@ export default {
 </script>
 
 <style>
-.titolo {
-  color: whitesmoke;
-  font-family: fantasy;
-}
-
 .card {
   width: 200px;
   height: 300px;
@@ -157,31 +111,17 @@ export default {
   color: black;
   height: 4px;
 }
-.tiolo {
-  color: white;
-  font-family: Georgia, "Times New Roman", Times, serif;
-}
-
-.overview {
-  color: white;
-  font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 13px;
-}
-
 .distanza {
   margin-top: 20px;
   margin-bottom: 20px;
 }
-
-.bottone {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  left: 10px;
-  padding: 10px;
-  font-family: monospace;
-}
 .altro {
   margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.pulsante {
+  max-width: 300px;
 }
 </style>

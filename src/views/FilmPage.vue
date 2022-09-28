@@ -1,58 +1,20 @@
 <template>
-  <div class="container text-center">
-    <div class="row">
-      <div class="col" v-for="movie in movies.results" :key="movie.id">
-        <div class="distanza card text-bg-dark">
-          <img
-            :src="`https://image.tmdb.org/t/p/original` + movie.poster_path"
-            :alt="movie.title"
-            class="card grandezza"
-            @click="vediDettagli(movie.id)"
-          />
-          <div v-show="dettagli" class="card-img-overlay"></div>
-        </div>
-        <hr class="linea" />
-      </div>
-    </div>
-  </div>
-  <div class="btn-group altro" role="group" aria-label="Basic example">
-    <button
-      v-if="this.$root.selectedLanguage == 'it'"
-      type="button"
-      class="btn btn-primary"
-      @click="mostraAltro"
-    >
-      Mostra di piu'
-    </button>
-    <button
-      v-if="this.$root.selectedLanguage == 'it'"
-      type="button"
-      class="btn btn-primary"
-      @click="mostraMeno"
-    >
-      Mostra meno
-    </button>
-    <button
-      v-if="this.$root.selectedLanguage == 'en'"
-      type="button"
-      class="btn btn-primary"
-      @click="mostraAltro"
-    >
-      Show more
-    </button>
-    <button
-      v-if="this.$root.selectedLanguage == 'en'"
-      type="button"
-      class="btn btn-primary"
-      @click="mostraMeno"
-    >
-      Show less
-    </button>
+  <div>
+    <home-comp :vediDettagli="vediDettagli" :displays="movies"></home-comp>
+    <pagination-component
+      :next="mostraAltro"
+      :previous="mostraMeno"
+      :currentPage="movies.page"
+      :totalPages="movies.total_pages"
+    ></pagination-component>
   </div>
 </template>
 
 <script>
-var rootElement = document.documentElement;
+import PaginationComponent from "@/components/PaginationComponent.vue";
+import HomeComp from "@/components/HomeComp.vue";
+let top = document.documentElement;
+
 export default {
   mounted() {
     this.getMovies();
@@ -64,6 +26,7 @@ export default {
       { immediate: true }
     );
   },
+  components: { PaginationComponent, HomeComp },
 
   data() {
     return {
@@ -104,7 +67,7 @@ export default {
     mostraAltro() {
       this.movies.page++;
       this.getMovies();
-      rootElement.scrollTo({
+      top.scrollTo({
         top: 0,
         behavior: "smooth",
       });
@@ -115,7 +78,7 @@ export default {
       }
       this.movies.page--;
       this.getMovies();
-      rootElement.scrollTo({
+      top.scrollTo({
         top: 0,
         behavior: "smooth",
       });
@@ -136,10 +99,6 @@ export default {
 </script>
 
 <style>
-.tiolo {
-  color: white;
-  font-family: fantasy;
-}
 .card {
   width: 200px;
   height: 300px;
@@ -158,26 +117,13 @@ export default {
   opacity: 50%;
 }
 
-.tiolo {
-  color: white;
-  font-family: Georgia, "Times New Roman", Times, serif;
-}
-
-.overview {
-  color: white;
-  font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 17px;
-}
-.bottone {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  left: 10px;
-  padding: 10px;
-  font-family: monospace;
-}
-
 .altro {
   margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.pulsante {
+  max-width: 300px;
 }
 </style>

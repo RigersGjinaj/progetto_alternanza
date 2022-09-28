@@ -1,64 +1,29 @@
 <template>
-  <titolo-comp :titolo="tv.name"></titolo-comp>
-  <div class="parent flex-parent">
-    <div class="child flex-child">
-      <locandina-comp :immagine="tv.poster_path"></locandina-comp>
-    </div>
-    <div class="child flex-child riquadro">
-      <descrizione-comp
-        :trama="tv.overview"
-        :dataDiRilascio="tv.first_air_date"
-        :votoMedio="tv.vote_average"
-        :contoVoti="tv.vote_count"
-      ></descrizione-comp>
-      <provider-comp
-        :flatrate="flatrate"
-        :buy="buy"
-        :link="link"
-      ></provider-comp>
-    </div>
-  </div>
-  <recensioni-comp :reviews="reviews"></recensioni-comp>
-  <h3 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
-    Serie TV simili
-  </h3>
-  <h3 v-else class="titolo">Similar TV series</h3>
-  <h3
-    v-if="
-      recommendations.results.length == 0 && this.$root.selectedLanguage == 'it'
-    "
-    class="titolo"
-  >
-    Non ci sono serie tv simili
-  </h3>
-  <h3
-    v-else-if="
-      recommendations.results.length == 0 && this.$root.selectedLanguage == 'en'
-    "
-    class="titolo"
-  >
-    There are no similar TV series
-  </h3>
-  <div class="container text-center">
-    <div class="row">
-      <div
-        class="col"
-        v-for="recommendation in recommendations.results"
-        :key="recommendation.id"
-      >
-        <div class="distanza card text-bg-dark">
-          <img
-            :src="
-              `https://image.tmdb.org/t/p/original` + recommendation.poster_path
-            "
-            :alt="recommendation.title"
-            class="card grandezza"
-            @click="vediDettagli(recommendation.id)"
-          />
-          <div v-show="dettagli" class="card-img-overlay"></div>
-        </div>
+  <div>
+    <titolo-comp :titolo="tv.name"></titolo-comp>
+    <div class="parent flex-parent">
+      <div class="child flex-child">
+        <locandina-comp :immagine="tv.poster_path"></locandina-comp>
+      </div>
+      <div class="child flex-child riquadro">
+        <descrizione-comp
+          :trama="tv.overview"
+          :dataDiRilascio="tv.first_air_date"
+          :votoMedio="tv.vote_average"
+          :contoVoti="tv.vote_count"
+        ></descrizione-comp>
+        <provider-comp
+          :flatrate="flatrate"
+          :buy="buy"
+          :link="link"
+        ></provider-comp>
       </div>
     </div>
+    <recensioni-comp :reviews="reviews"></recensioni-comp>
+    <simili-comp
+      :redirect="vediDettagli"
+      :recommendations="recommendations"
+    ></simili-comp>
   </div>
 </template>
 
@@ -68,6 +33,7 @@ import TitoloComp from "@/components/TitoloComp.vue";
 import LocandinaComp from "@/components/LocandinaComp.vue";
 import ProviderComp from "@/components/ProviderComp.vue";
 import RecensioniComp from "@/components/RecensioniComp.vue";
+import SimiliComp from "@/components/SimiliComp.vue";
 export default {
   mounted() {
     this.getTv();
@@ -81,6 +47,7 @@ export default {
     LocandinaComp,
     ProviderComp,
     RecensioniComp,
+    SimiliComp,
   },
   data() {
     return {

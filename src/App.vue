@@ -90,6 +90,29 @@
   </nav>
   <hr class="linea" />
   <router-view />
+  <div class="alert alert-dark fondo" role="alert">
+    <div class="contenuto">
+      <router-link to="/" class="textFondo sopra">Home</router-link>
+      <router-link
+        v-if="this.selectedLanguage == 'it'"
+        to="/film"
+        class="textFondo sopra"
+        >Film</router-link
+      >
+      <router-link v-else to="/film" class="textFondo sopra"
+        >Movies</router-link
+      >
+      <router-link
+        v-if="this.selectedLanguage == 'it'"
+        to="/serietv"
+        class="textFondo sopra"
+        >Serie TV</router-link
+      >
+      <router-link v-else to="/film" class="textFondo sopra"
+        >TV series</router-link
+      >
+    </div>
+  </div>
 </template>
 
 <script>
@@ -129,6 +152,25 @@ export default {
 .stile {
   background-color: #36454f;
 }
+.textFondo {
+  color: black;
+  font-size: 40px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  text-decoration: none;
+}
+.fondo {
+  background-color: #7393b3;
+  margin-top: 20px;
+  min-height: 200px;
+  margin-bottom: 0px;
+  border: none;
+  border-radius: 0px;
+}
+.sopra:hover {
+  color: #36454f;
+}
 .linea {
   color: black;
   height: 4px;
@@ -141,12 +183,14 @@ export default {
   font-size: 25px;
   margin-left: 10px;
   font-family: fantasy;
+  text-decoration: none;
 }
 
 .titoloLogo {
   font-family: fantasy;
   color: white;
   font-size: 35px;
+  text-decoration: none;
 }
 
 .selezione {
