@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg stile">
     <div class="container-fluid">
       <router-link to="/">
-        <h1 class="titoloLogo mouse">Movie World</h1>
+        <h1 class="titoloLogo mouse">MovieWorld</h1>
       </router-link>
       <button
         class="navbar-toggler"
@@ -56,6 +56,26 @@
               <option v-else value="en">English</option>
             </select>
           </li>
+          <li>
+            <div class="dropdown">
+              <button
+                type="button"
+                class="btn btn-outline-info selezione"
+                @click="login"
+                v-if="loginControl == false"
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                class="btn btn-info selezione"
+                @click="logout"
+                v-if="loginControl == true"
+              >
+                Logout
+              </button>
+            </div>
+          </li>
         </ul>
         <form class="d-flex" role="search" @submit.prevent="ricerca">
           <input
@@ -90,7 +110,7 @@
   </nav>
   <hr class="linea" />
   <router-view />
-  <div class="alert alert-dark fondo" role="alert">
+  <div class="alert alert-dark fondo" role="alert" id="footer">
     <div class="contenuto">
       <router-link to="/" class="textFondo sopra">Home</router-link>
       <router-link
@@ -117,11 +137,22 @@
 
 <script>
 export default {
-  mounted() {},
+  async created() {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    if (params.request_token && params.approved) {
+      this.session = await this.sessione(params.request_token);
+      this.loginControl = true;
+    }
+  },
   data() {
     return {
       search: null,
       selectedLanguage: "it",
+      token: {},
+      session: {},
+      loginControl: false,
     };
   },
   methods: {
@@ -133,8 +164,80 @@ export default {
       this.search = null;
     },
 
-    translate() {
-      console.log(this.selectedLanguage);
+    async fetcher(url, options = {}) {
+      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      options.api_key = apiKey;
+      options.language = this.selectedLanguage || "it";
+      const queryParams = "?" + new URLSearchParams(options).toString();
+      try {
+        const res = await fetch(
+          "https://api.themoviedb.org/3/" + url + queryParams
+        );
+        return await res.json();
+      } catch (message) {
+        return console.error(message);
+      }
+    },
+    async sessione(requestToken) {
+      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      const options = {};
+      options.api_key = apiKey;
+      options.language = this.selectedLanguage || "it";
+      const queryParams = "?" + new URLSearchParams(options).toString();
+      try {
+        const res = await fetch(
+          "https://api.themoviedb.org/3/authentication/session/new" +
+            queryParams,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              request_token: requestToken,
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          }
+        );
+        return await res.json();
+      } catch (message) {
+        return console.error(message);
+      }
+    },
+    async login() {
+      this.token = await this.fetcher("authentication/token/new");
+      window.open(
+        "https://www.themoviedb.org/authenticate/" +
+          this.token.request_token +
+          "?redirect_to=http://localhost:8080" +
+          this.$route.path,
+        "_self"
+      );
+    },
+
+    async logout() {
+      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      const options = {};
+      options.api_key = apiKey;
+      options.language = this.selectedLanguage || "it";
+      const queryParams = "?" + new URLSearchParams(options).toString();
+      try {
+        const res = await fetch(
+          "https://api.themoviedb.org/3/authentication/session" + queryParams,
+          {
+            method: "DELETE",
+            body: JSON.stringify({
+              session_id: this.session.session_id,
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          }
+        );
+        this.loginControl = false;
+        return await res.json();
+      } catch (message) {
+        return console.error(message);
+      }
     },
   },
 };
@@ -151,6 +254,11 @@ export default {
 }
 .stile {
   background-color: #36454f;
+  max-height: 70px;
+}
+.login {
+  background-color: whitesmoke;
+  width: 600px;
 }
 .textFondo {
   color: black;

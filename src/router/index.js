@@ -29,6 +29,11 @@ const routes = [
     name: "paginaTv",
     component: () => import("@/components/PaginaDettagliTv.vue"),
   },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("@/views/NotFound.vue"),
+  },
 ];
 
 const router = createRouter({

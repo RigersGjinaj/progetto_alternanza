@@ -38,7 +38,6 @@ export default {
   methods: {
     async getMovies() {
       this.movies = await this.fetcher("movie/popular");
-      console.log(this.movies);
     },
 
     async fetcher(url, options = {}) {

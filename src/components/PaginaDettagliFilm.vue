@@ -11,9 +11,8 @@
           :dataDiRilascio="movie.release_date"
           :votoMedio="movie.vote_average"
           :contoVoti="movie.vote_count"
-          :entra="approvazione"
-          :session="session"
           :vota="vota"
+          :elimina="elimina"
         ></descrizione-comp>
         <provider-comp
           :flatrate="flatrate"
@@ -42,8 +41,6 @@ export default {
     this.getRecommendations();
     this.getReviews();
     this.getProviders();
-    this.getAuthentication();
-    /*this.getToken();*/
   },
 
   components: {
@@ -85,9 +82,6 @@ export default {
       buy: {},
       link: "",
       traslations: [],
-      token: {},
-      session: undefined,
-      voto: {},
       guest: {},
     };
   },
@@ -109,22 +103,6 @@ export default {
         return console.error(message);
       }
     },
-    /* async sessions(url, options = {}) {
-      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
-      options.api_key = apiKey;
-      options.language = this.$root.selectedLanguage || "it";
-      options.request_token = this.token.request_token;
-      const queryParams = "?" + new URLSearchParams(options).toString();
-      try {
-        const res = await fetch(
-          "https://api.themoviedb.org/3/" + url + queryParams
-        );
-        return await res.json();
-      } catch (message) {
-        return console.error(message);
-      }
-    },*/
-
     async getRecommendations() {
       this.recommendations = await this.fetcher(
         "movie/" + this.$route.params.movie + "/recommendations"
@@ -158,40 +136,60 @@ export default {
         ? `https://image.tmdb.org/t/p/original${path}`
         : `https://www.google.com/search?q=img+100x100&rlz=1C1ONGR_itIT1023IT1023&sxsrf=ALiCzsYsmGF83Wom32UvtR0BCO5Eye9idw:1664196645966&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjc7azPv7L6AhWKRvEDHYqLAlAQ_AUoAXoECAEQAw&biw=1366&bih=625&dpr=1#imgrc=L9VFGqEeTKmGeM`;
     },
-    /*async getToken() {
-      this.token = await this.fetcher("authentication/token/new");
-    },
-    async getSession() {
-      this.session = await this.sessions("authentication/session/new");
-    },
-    approvazione() {
-      this.getToken();
-      window.location.href =
-        "https://www.themoviedb.org/authenticate/" + this.token.request_token;
-      this.getSession();
-      console.log(this.session);
-    },*/
-    async autentifica(url, options = {}) {
+    async vota(rate) {
+      this.movie.vote_count++;
       const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      const options = {};
       options.api_key = apiKey;
       options.language = this.$root.selectedLanguage || "it";
-      options.guest_session_id = this.guest.guest_session_id;
+      options.session_id = this.$root.session.session_id;
       const queryParams = "?" + new URLSearchParams(options).toString();
       try {
         const res = await fetch(
-          "https://api.themoviedb.org/3/" + url + queryParams
+          "https://api.themoviedb.org/3/movie/" +
+            this.$route.params.movie +
+            "/rating" +
+            queryParams,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              value: rate,
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          }
         );
         return await res.json();
       } catch (message) {
         return console.error(message);
       }
     },
-    async getAuthentication() {
-      this.guest = await this.fetcher("authentication/guest_session/new");
-    },
-    vota() {
-      this.getAuthentication();
-      this.autentifica();
+    async elimina() {
+      this.movie.vote_count--;
+      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      const options = {};
+      options.api_key = apiKey;
+      options.language = this.$root.selectedLanguage || "it";
+      options.session_id = this.$root.session.session_id;
+      const queryParams = "?" + new URLSearchParams(options).toString();
+      try {
+        const res = await fetch(
+          "https://api.themoviedb.org/3/movie/" +
+            this.$route.params.movie +
+            "/rating" +
+            queryParams,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          }
+        );
+        return await res.json();
+      } catch (message) {
+        return console.error(message);
+      }
     },
   },
 };

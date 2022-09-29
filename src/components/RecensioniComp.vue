@@ -5,12 +5,25 @@
     </h3>
     <h3 v-else class="titolo">Reviews:</h3>
     <h4
-      v-if="this.$root.selectedLanguage == 'it'"
+      v-if="
+        this.$root.selectedLanguage == 'it' &&
+        reviews &&
+        reviews.results &&
+        reviews.results.length == 0
+      "
       class="titolo"
     >
       Non ci sono recensioni
     </h4>
-    <h4 v-else-if="this.$root.selectedLanguage == 'en'" class="titolo">
+    <h4
+      v-else-if="
+        this.$root.selectedLanguage == 'en' &&
+        reviews &&
+        reviews.results &&
+        reviews.results.length == 0
+      "
+      class="titolo"
+    >
       There are no reviews
     </h4>
     <div

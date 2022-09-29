@@ -1,15 +1,35 @@
 <template>
-  <h1 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
+  <h1
+    v-if="this.$root.selectedLanguage == 'it' && controllo == false"
+    class="titolo"
+  >
     Film migliori
   </h1>
-  <h1 v-else class="titolo">Top rated movies</h1>
+  <h1
+    v-if="this.$root.selectedLanguage == 'en' && controllo == false"
+    class="titolo"
+  >
+    Top rated movies
+  </h1>
   <home-comp :vediDettagli="vediDettagliFilm" :displays="movies"></home-comp>
   <hr class="linea" />
-  <h1 v-if="this.$root.selectedLanguage == 'it'" class="titolo">
+  <h1
+    v-if="this.$root.selectedLanguage == 'it' && controllo == false"
+    class="titolo"
+  >
     Serie TV migliori
   </h1>
-  <h1 v-else class="titolo">Top rated TV series</h1>
-  <home-comp :vediDettagli="vediDettagliTV" :displays="tvs"></home-comp>
+  <h1
+    v-if="this.$root.selectedLanguage == 'en' && controllo == false"
+    class="titolo"
+  >
+    Top rated TV series
+  </h1>
+  <home-comp
+    v-show="controllo == false"
+    :vediDettagli="vediDettagliTV"
+    :displays="tvs"
+  ></home-comp>
 </template>
 
 <script>
@@ -32,6 +52,7 @@ export default {
     return {
       movies: [],
       tvs: [],
+      controllo: false,
     };
   },
   methods: {
@@ -63,6 +84,26 @@ export default {
         return console.error(message);
       }
     },
+    async getRisultatoFilm(search) {
+      this.movies = await this.fetcher("search/multi", { query: search });
+      this.controllo = true;
+    },
+    async getRisultatoSerieTV(search) {
+      this.tvs = await this.fetcher("search/multi", { query: search });
+      this.controllo = true;
+    },
+  },
+
+  watch: {
+    "$route.query.search": {
+      handler: function (search) {
+        if (search)
+          this.getRisultatoFilm(search) && this.getRisultatoSerieTV(search);
+        else this.getMovies() && this.getTv();
+      },
+      deep: true,
+      immediate: true,
+    },
   },
 };
 </script>
@@ -87,5 +128,8 @@ export default {
 .grandezza:hover {
   border: solid 4px whitesmoke;
   opacity: 50%;
+}
+#foote {
+  opacity: 100%;
 }
 </style>

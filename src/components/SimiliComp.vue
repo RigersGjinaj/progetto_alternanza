@@ -3,7 +3,10 @@
   <h3 v-else class="titolo">Similar movies</h3>
   <h3
     v-if="
-      recommendations.results.length == 0 && this.$root.selectedLanguage == 'it'
+      recommendations &&
+      recommendations.results &&
+      recommendations.results.length == 0 &&
+      this.$root.selectedLanguage == 'it'
     "
     class="titolo"
   >
@@ -11,7 +14,10 @@
   </h3>
   <h3
     v-else-if="
-      recommendations.results.length == 0 && this.$root.selectedLanguage == 'en'
+      recommendations &&
+      recommendations.results &&
+      recommendations.results.length == 0 &&
+      this.$root.selectedLanguage == 'en'
     "
     class="titolo"
   >

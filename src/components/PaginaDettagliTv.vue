@@ -11,6 +11,8 @@
           :dataDiRilascio="tv.first_air_date"
           :votoMedio="tv.vote_average"
           :contoVoti="tv.vote_count"
+          :vota="vota"
+          :elimina="elimina"
         ></descrizione-comp>
         <provider-comp
           :flatrate="flatrate"
@@ -134,6 +136,62 @@ export default {
       return path != undefined
         ? `https://image.tmdb.org/t/p/original${path}`
         : `https://www.google.com/search?q=img+100x100&rlz=1C1ONGR_itIT1023IT1023&sxsrf=ALiCzsYsmGF83Wom32UvtR0BCO5Eye9idw:1664196645966&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjc7azPv7L6AhWKRvEDHYqLAlAQ_AUoAXoECAEQAw&biw=1366&bih=625&dpr=1#imgrc=L9VFGqEeTKmGeM`;
+    },
+    async vota(rate) {
+      this.tv.vote_count++;
+      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      const options = {};
+      options.api_key = apiKey;
+      options.language = this.$root.selectedLanguage || "it";
+      options.session_id = this.$root.session.session_id;
+      const queryParams = "?" + new URLSearchParams(options).toString();
+      try {
+        const res = await fetch(
+          "https://api.themoviedb.org/3/tv/" +
+            this.$route.params.tv +
+            "/rating" +
+            queryParams,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              value: rate,
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          }
+        );
+        return await res.json();
+      } catch (message) {
+        return console.error(message);
+      }
+    },
+
+    async elimina() {
+      this.tv.vote_count--;
+      const apiKey = "6f9286d54de4891ea7a5c91779e09786";
+      const options = {};
+      options.api_key = apiKey;
+      options.language = this.$root.selectedLanguage || "it";
+      options.session_id = this.$root.session.session_id;
+      const queryParams = "?" + new URLSearchParams(options).toString();
+      try {
+        const res = await fetch(
+          "https://api.themoviedb.org/3/tv/" +
+            this.$route.params.tv +
+            "/rating" +
+            queryParams,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          }
+        );
+        return await res.json();
+      } catch (message) {
+        return console.error(message);
+      }
     },
   },
 };
