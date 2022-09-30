@@ -153,6 +153,7 @@ export default {
       token: {},
       session: {},
       loginControl: false,
+      localhost_8080: process.env.localhost_8080,
     };
   },
   methods: {
@@ -208,7 +209,7 @@ export default {
       window.open(
         "https://www.themoviedb.org/authenticate/" +
           this.token.request_token +
-          "?redirect_to=http://localhost:8080" +
+          "?redirect_to=" +this.localhost_8080+
           this.$route.path,
         "_self"
       );
