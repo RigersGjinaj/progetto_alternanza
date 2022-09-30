@@ -153,7 +153,7 @@ export default {
       token: {},
       session: {},
       loginControl: false,
-      localhost_8080: process.env.localhost_8080,
+      VUE_APP_SERVICE_URL: process.env.VUE_APP_SERVICE_URL,
     };
   },
   methods: {
@@ -210,7 +210,7 @@ export default {
         "https://www.themoviedb.org/authenticate/" +
           this.token.request_token +
           "?redirect_to=" +
-          this.localhost_8080 +
+          this.VUE_APP_SERVICE_URL +
           this.$route.path,
         "_self"
       );
