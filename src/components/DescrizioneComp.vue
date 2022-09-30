@@ -114,6 +114,8 @@ export default {
     },
     delate() {
       this.rating = null;
+      clearTimeout();
+      this.timer = 5000;
       this.elimina();
     },
   },
@@ -136,7 +138,7 @@ export default {
       currentRating: "No Rating",
       mouseOverRating: null,
       disabilitato: false,
-      timer: 10000,
+      timer: 5000,
     };
   },
 };
