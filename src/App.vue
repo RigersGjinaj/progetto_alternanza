@@ -236,7 +236,6 @@ export default {
           }
         );
         this.loginControl = false;
-        this.$router.push(this.VUE_APP_SERVICE_URL + this.$route.path);
         return await res.json();
       } catch (message) {
         return console.error(message);
