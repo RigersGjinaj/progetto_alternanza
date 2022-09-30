@@ -210,8 +210,7 @@ export default {
         "https://www.themoviedb.org/authenticate/" +
           this.token.request_token +
           "?redirect_to=" +
-          this.VUE_APP_SERVICE_URL +
-          this.$route.path,
+          this.VUE_APP_SERVICE_URL,
         "_self"
       );
     },
