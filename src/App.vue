@@ -209,7 +209,8 @@ export default {
       window.open(
         "https://www.themoviedb.org/authenticate/" +
           this.token.request_token +
-          "?redirect_to=" +this.localhost_8080+
+          "?redirect_to=" +
+          this.localhost_8080 +
           this.$route.path,
         "_self"
       );
